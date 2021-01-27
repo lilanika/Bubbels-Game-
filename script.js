@@ -1,4 +1,5 @@
 // Playerimages 
+
 const playerLeft = new Image();
 playerLeft.src = 'images/fish_swim_left.png ';
 
@@ -392,9 +393,9 @@ class EnemyfromLeft {
         //if enemy disapperead 
         if (this.x > canvas.width - this.radius * 2) {
             //reset
-            this.x  = 0 - 5000;
+            this.x  = 0 - 4000;
             this.y = Math.random() * (canvas.height -150) + 90; 
-            this.speed = Math.random() * 10 + 2; 
+            this.speed = Math.random() * 11 + 2; 
         }
 
         // collision with player 
