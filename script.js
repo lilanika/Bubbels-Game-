@@ -28,6 +28,11 @@ bubblePop1.src = 'sound/Plop.ogg';
 const bubblePop2 = document.createElement('audio');
 bubblePop2.src = 'sound/bubbles-single2.wav';
 
+//button 
+const restartBtn= document.getElementById('startBtn');
+restartBtn.style.display ='none'; 
+ 
+
 /////////// 1. Canvas Setup //////////////////////
 
 const canvas = document.getElementById('canvas1');
@@ -40,7 +45,7 @@ canvas.height = 500;
 let score = 0; 
 //GameFrame increased by one for every animation Loop.
 let gameFrame = 80; 
-ctx.font = '50px Georgia'; 
+ctx.font = '50px Grandstander'; 
 let gameSpeed = 1; 
 let gameOver = false; 
 
@@ -419,13 +424,27 @@ function handleEnemies() {
 }
 
 function handleGameOver() {
-    ctx.rect(0, 0, canvas.width, canvas.height, 'black' )
-    ctx.fullStyle = 'white'; 
-    ctx.fillText('GAME OVER ' + score, 60, 100 ); 
+    
+    //ctx.fillStyle = 'red';
+    //ctx.lineWidth = 5;
+    //ctx.strokeRect( 0, 0, 800, 500 ) 
+    ctx.font = '60px Grandstander'
+    ctx.fillStyle = ' #5499c7 ';  //#04B486
+    //ctx.fillText('G A M E   O V E R ', 200, 150 ); 
     gameOver = true; 
+    restartBtn.style.display ='inline'
 }
 
 ////////////// function animation ////////////////
+
+/*
+const startBtn= document.getElementById('startBtn');
+
+
+function reload() {
+    startBtn.style.display ='none'; 
+} 
+*/
 
 function animate( ) {
     ctx.clearRect( 0, 0, canvas.width, canvas.height);
@@ -435,9 +454,11 @@ function animate( ) {
     player.draw();
     handleEnemies()
 
-    ctx.fillStyle = 'blue';
+    //ctx.fillStyle = ' #922b21 ';
+    ctx.font = '159px Grandstander'
+    ctx.fillStyle = "rgba(241, 196, 15 )";
     // text|| x.position || y.position
-    ctx.fillText(`score: ${score}`,10,40);
+    ctx.fillText(` ${score}`,0, 450); //10/45
     // for the bubbels
      gameFrame++; 
     //console.log(gameFrame); 
@@ -452,3 +473,5 @@ animate()
 
 https://stackoverflow.com/questions/17480115/a-function-to-preload-images-need-to-draw-them-now-but-how
 https://www.reddit.com/r/learnprogramming/comments/1xrf6j/html5javascript_canvas_hell_and_image_preloading/ */
+
+
