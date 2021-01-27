@@ -2,21 +2,20 @@
 /////////// 1. Canvas Setup //////////////////////
 
 const canvas = document.getElementById('canvas1');
-// it will need getContext, to have access to build in 2d drawing methods 
+//  getContext, to have access to build in 2d drawing methods 
 const ctx = canvas.getContext('2d');
 canvas.width = 800; 
 canvas.height = 500; 
 
 //Global variables 
-
-// Score increased by one for every bubble that the fish caught
 let score = 0; 
 //GameFrame increased by one for every animation Loop.
-let gameFrame = 0; 
+let gameFrame = 80; 
 ctx.font = '50px Georgia'; 
 let gameSpeed = 1; 
+let gameOver = false; 
 
-/////////////////2. Get the Mouse coordinates ////////////////
+///////////////// 2. Mouse coordinates ////////////////////
 
 let canvasPosition = canvas.getBoundingClientRect(); 
 // console.log(canvasPosition)
@@ -24,17 +23,16 @@ let canvasPosition = canvas.getBoundingClientRect();
 //resize window to right mouse position
 window.addEventListener('resize', function (){
     canvasPosition = canvas.getBoundingClientRect(); 
-
 });
 
-// create mouse object with his startposition
+// mouse object & startposition
 const mouse =  { 
     x: canvas.width / 2 ,    // = 400 ist die mitte 
     y: canvas.height / 2,   //  = 250 ist die mitte
     click: false
 }
 
-// create two eventlistners ( mousedown, mouseup )
+// eventlistener 
 canvas.addEventListener('mousedown', function(event) {
    mouse.click = true; 
    mouse.x = event.x - Math.floor(canvasPosition.left); 
@@ -46,7 +44,13 @@ canvas.addEventListener('mouseup',function(){
     mouse.click = false; 
 }) 
 
-//////////////////////3.create player/////////////////////
+//sounds 
+const bubblePop1 = document.createElement('audio');
+bubblePop1.src = 'sound/Plop.ogg';
+const bubblePop2 = document.createElement('audio');
+bubblePop2.src = 'sound/bubbles-single2.wav';
+
+////////////////////// player Class /////////////////////
 
 // Playerimages 
 const playerLeft = new Image();
@@ -61,41 +65,38 @@ class Player {
         this.x = canvas.width;    // direction from left or right
         this.y = canvas.height/2; // half of the height 
         this.radius = 30; 
-        // player rotate around in a circle to face the mouse
-        // calculte theta wich is the counterclockwise angle between x acsis and any point. 
+        // calculation result of theta
         this.angle = 0; 
         //for the images
         this.frameX = 0; 
         this.frameY = 0; 
         this.frame = 0;  
-        //the position of the frame, that we need from the sheet.  
+        //the position of the frame, from the Sprite sheets
         this.spriteWidth = 498; 
         this.spriteHeight = 327; 
     }
 
     update() { 
-         //calculate distance betweend player und mouse 
+         //calculating distance betweend player und mouse 
         const distanceXplayerMouse = this.x -mouse.x;
         const distanceYplayerMouse  = this.y -mouse.y; 
-        // to rotate the fishposition 
+        // rotate the fishposition, face the mouse 
         let theta = Math.atan2(distanceYplayerMouse, distanceXplayerMouse )
         this.angle = theta 
         // change the current player position  
         if (mouse.x !== this.x) { 
-            this.x -= distanceXplayerMouse /20 ; // speed of movemend 
+            this.x -= distanceXplayerMouse /18 ; // speed of movemend 
         } 
         if( mouse.y !== this.y) {
-            this.y -= distanceYplayerMouse/20;
+            this.y -= distanceYplayerMouse/18;
         }
     }
     draw(){
-
        // save current canvas settings
        ctx.save(); 
-       // reflect curretly player position
+       // reflect currently player position
        ctx.translate(this.x , this.y); 
        ctx.rotate(this.angle);
-
 
         if(this.x >= mouse.x){
             ctx.drawImage(playerLeft, 
@@ -127,14 +128,15 @@ class Player {
         ctx.restore()
     }
 } 
-//create Player Object 
+
+//Player Object 
 const player = new Player()
 
-
-////////////// 4. create Bubbles ////////////////////
+////////////// Bubble Class ////////////////////
 
 const bubblesArray = [];
-//Bubble Image 
+
+//BubbleImage  
 const bubbleImage = new Image(); 
 bubbleImage.src = 'images/bubble_pop_frame_01.png'; 
 class Bubble {
@@ -144,12 +146,12 @@ class Bubble {
         this.y = canvas.height + 100 ;
         this.radius = 50;
         //a rendom number between 1 and 6 
-        this.speed = Math.random() * 5 + 1;
-
+        this.speed = Math.random() * 10 + 1;
+        //result of calculation of each individual bubble and player.
         this.distance; 
-        // add only one point per bubble count to the score. 
+        // adding only one point per bubble count to the score. 
         this.counted = false; 
-        //ternary operator. assigned randomly
+        //ternary operator. assigned randomly sound to bubbles
         this.sound = Math.random() <= 0.5 ? 'sound1':'sound2' ; 
      }
    
@@ -175,14 +177,10 @@ class Bubble {
 
 ////////////////////// 4.1 function handleBubbles() ////////////
 
-const bubblePop1 = document.createElement('audio');
-bubblePop1.src = 'sound/Plop.ogg';
-const bubblePop2 = document.createElement('audio');
-bubblePop2.src = 'sound/bubbles-single2.wav';
 
 function handleBubbles() {
-  
-    if (gameFrame % 50 == 0) { 
+        
+    if (gameFrame % 45 == 0) { 
         bubblesArray.push(new Bubble());
         //console.log(bubblesArray.length);
     }
@@ -190,7 +188,8 @@ function handleBubbles() {
     for(let i = 0; i < bubblesArray.length; i++) {
         //each element calling this methods 
         bubblesArray[i].update(); 
-        bubblesArray[i].draw();   
+        bubblesArray[i].draw();  
+        //prevent the array from growing endlessly. 
         //check if bubble has disappeared over the top edge
         if(bubblesArray[i].y < 0 - bubblesArray[i].radius * 2){
          //if so remove 
@@ -198,7 +197,7 @@ function handleBubbles() {
          //for the correct index 
          i--;
 
-
+    // check if if player and a bubble has a collision
     } else if 
     (bubblesArray[i].distance < bubblesArray[i].radius + player.radius) {   
 
@@ -216,35 +215,35 @@ function handleBubbles() {
    }
 }
 
-/////////////////////// animation Loop //////////////////////////
-/* Here we calling all functions */
-/*
-###### clearing the entire canvas from old paint with clearRect 
-###### calling handleBubbles()
-###### calling player.update();
-######  show the current score 
-######  increment gameFrame++ by one 
-######  creating an animation loop = requestAnimationFrame(animate);
-through a principle that called recursion, where a function calls itself over an over. */ 
+///////////////////////  Background  //////////////////////////
 
-
-
-
-// Repeating Background 
+// Repeating BackgroundImage 
 const background = new Image(); 
 background.src = 'images/D8GEAg5.png'; 
 
 const BG = { 
-    //first img 
+    //first wave img 
     firstImg_x: 0, 
-    //second img so right
+    //second wave img position right
     secondImg_x: canvas.width, 
     y: 0,
     width: canvas.width, 
     height: canvas.height
-}
+} 
 
-//////////////function handleBackground() ////////////////
+//BackgroundImage corals
+const corals = new Image(); 
+corals.src = 'images/corals.png'; 
+
+//BackgroundImage corals
+const BG2 = { 
+    x: 0,   
+    y: 0,
+    width: canvas.width, 
+    height: canvas.height
+}  
+
+////////////// function handleBackground /// ////////////////
 
 function handleBackground(){ 
 
@@ -268,32 +267,176 @@ function handleBackground(){
         BG.secondImg_x, 
         BG.y, 
         BG.width, 
-        BG.height );    
+        BG.height );   
+    
+    ctx.drawImage(
+        corals, 
+        BG2.x, 
+        BG2.y, 
+        BG2.width, 
+        BG2.height );  
 }
-  
+
+///////// enemys from from Right & Left  //////////////////////////////////////
+
+//EnemyfromRightImage
+const enemyFromRightImg = new Image(); 
+enemyFromRightImg.src = 'images/enemy1.png';
+
+//EnemyfromLeftImage
+const enemyLeftImg= new Image(); 
+enemyLeftImg.src = 'images/enemyLeft.png';
+
+class EnemyfromRight { 
+    constructor () {
+        //startposition
+        this.x = canvas.width - 400;
+        this.y = Math.random() * (canvas.height  - 150) + 90 ; 
+        //for collision 
+        this.radius = 60; 
+        this.speed = Math.random() * 8 + 2; 
+        //for drawImage
+        this.frame = 0;  
+        this.frameX = 0; 
+        this.frameY = 0; 
+        this.spriteWidth = 418; 
+        this.spriteHeight = 397;
+    }
+    draw() {
+        /*
+        ctx.fillStyle = ('red')
+        ctx.beginPath(); 
+        ctx.arc(this.x, this.y, this.radius, 0 , Math.PI * 2 );
+        ctx.fill();
+        */ 
+        ctx.drawImage ( enemyFromRightImg,
+            this.frameX * this.spriteWidth,
+            this.frameY * this.spriteHeight,
+            this.spriteWidth,
+            this.spriteHeight,
+            this.x -90,
+            this.y -85,
+            this.spriteWidth /2.2,
+            this.spriteHeight /2.2 )
+    }
+    update() {
+        // movement direction 
+        this.x -= this.speed; 
+        //if enemy disapperead 
+        if (this.x < 0 - this.radius * 2) {
+            //reset
+            this.x  = canvas.width + 700;
+            this.y = Math.random() * (canvas.height -150) + 90; 
+            this.speed = Math.random() * 10 + 2; 
+        }
+
+        // collision with player 
+        const distanceEnemyX = this.x - player.x;
+        const distanceEnemyY = this.y - player.y;
+        const distance = Math.sqrt(distanceEnemyX * distanceEnemyX+ distanceEnemyY * distanceEnemyY);
+
+        if ( distance < this.radius + player.radius) {
+            handleGameOver();
+        }
+    } 
+}
+
+class EnemyfromLeft { 
+    constructor () {
+        //startposition
+        this.x = 0 - 400;
+        this.y = Math.random() * (canvas.height  - 150) + 90 ; 
+        //for collision 
+        this.radius = 30; 
+        this.speed = Math.random() * 2 + 2; 
+        //for drawImage
+        this.frame = 0;  
+        this.frameX = 0; 
+        this.frameY = 0; 
+        this.spriteWidth = 418; 
+        this.spriteHeight = 397;
+    }
+    draw() {
+        /*
+        ctx.fillStyle = ('red')
+        ctx.beginPath(); 
+        ctx.arc(this.x, this.y, this.radius, 0 , Math.PI * 2 );
+        ctx.fill();
+        */
+
+        ctx.drawImage ( enemyLeftImg,
+            this.frameX * this.spriteWidth,
+            this.frameY * this.spriteHeight,
+            this.spriteWidth,
+            this.spriteHeight,
+            this.x -56,
+            this.y -35,
+            this.spriteWidth /4.2,
+            this.spriteHeight /4.2 )
+    }
+    update() {
+
+        // movement direction 
+        this.x += this.speed; 
+        //if enemy disapperead 
+        if (this.x > canvas.width - this.radius * 2) {
+            //reset
+            this.x  = 0 - 5000;
+            this.y = Math.random() * (canvas.height -150) + 90; 
+            this.speed = Math.random() * 10 + 2; 
+        }
+
+        // collision with player 
+        const distanceEnemyX = this.x - player.x;
+        const distanceEnemyY = this.y - player.y;
+        const distance = Math.sqrt(distanceEnemyX * distanceEnemyX+ distanceEnemyY * distanceEnemyY);
+
+        if ( distance < this.radius + player.radius) {
+            handleGameOver();
+        }
+    } 
+}
+
+
+const enemyRight = new EnemyfromRight(); 
+//const enemy2 = new EnemyfromRight()
+const enemyLeft = new EnemyfromLeft(); 
+
+
+////// function handleEnemeies & handleGameOver /////////////////
+
+function handleEnemies() { 
+    enemyRight.draw(); 
+    enemyRight.update(); 
+    enemyLeft.draw()
+    enemyLeft.update()
+}
+
+function handleGameOver() {
+    ctx.fullStyle = 'white'; 
+    ctx.fillText('GAME OVER ' + score, 60, 100 ); 
+    gameOver = true; 
+}
+
+////////////// function animation ////////////////
+
 function animate( ) {
-    //clearing the entire canvas from old paint. 
     ctx.clearRect( 0, 0, canvas.width, canvas.height);
-    // calling bubbles function. 
     handleBackground();
     handleBubbles();
-    //calling the player-update Method to calculate player position
     player.update();
-    // calling player-draw Method to draw a line between player and Mouse and draw a circle
     player.draw();
-    
-  
-    ctx.fillStyle = 'black';
+    handleEnemies()
+
+    ctx.fillStyle = 'blue';
     // text|| x.position || y.position
-    ctx.fillText(`score: ${score}`,10,50);
-    // every frame of animation this variable increment by one 
+    ctx.fillText(`score: ${score}`,10,40);
+    // for the bubbels
      gameFrame++; 
     //console.log(gameFrame); 
     //creating an animation loop, through a principle that called recursion, where a function calls itself over an over.
+    if(!gameOver)
     requestAnimationFrame(animate);
 }
 
 animate()
-
-
-
