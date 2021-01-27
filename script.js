@@ -1,3 +1,32 @@
+// Playerimages 
+const playerLeft = new Image();
+playerLeft.src = 'images/fish_swim_left.png ';
+
+const playerRight = new Image(); 
+playerRight.src ='images/fish_swim_right.png';
+
+// Repeating BackgroundImage 
+const background = new Image(); 
+background.src = 'images/D8GEAg5.png'; 
+
+//BubbleImage  
+const bubbleImage = new Image(); 
+bubbleImage.src = 'images/bubble_pop_frame_01.png'; 
+
+//EnemyfromRightImage
+const enemyFromRightImg = new Image(); 
+enemyFromRightImg.src = 'images/enemy1.png';
+
+//EnemyfromLeftImage
+const enemyLeftImg= new Image(); 
+enemyLeftImg.src = 'images/enemyLeft.png';
+
+
+//sounds 
+const bubblePop1 = document.createElement('audio');
+bubblePop1.src = 'sound/Plop.ogg';
+const bubblePop2 = document.createElement('audio');
+bubblePop2.src = 'sound/bubbles-single2.wav';
 
 /////////// 1. Canvas Setup //////////////////////
 
@@ -44,20 +73,8 @@ canvas.addEventListener('mouseup',function(){
     mouse.click = false; 
 }) 
 
-//sounds 
-const bubblePop1 = document.createElement('audio');
-bubblePop1.src = 'sound/Plop.ogg';
-const bubblePop2 = document.createElement('audio');
-bubblePop2.src = 'sound/bubbles-single2.wav';
 
 ////////////////////// player Class /////////////////////
-
-// Playerimages 
-const playerLeft = new Image();
-playerLeft.src = 'images/fish_swim_left.png ';
-
-const playerRight = new Image(); 
-playerRight.src ='images/fish_swim_right.png';
 
 class Player {
     constructor(){
@@ -136,9 +153,6 @@ const player = new Player()
 
 const bubblesArray = [];
 
-//BubbleImage  
-const bubbleImage = new Image(); 
-bubbleImage.src = 'images/bubble_pop_frame_01.png'; 
 class Bubble {
     constructor(){
 
@@ -217,9 +231,7 @@ function handleBubbles() {
 
 ///////////////////////  Background  //////////////////////////
 
-// Repeating BackgroundImage 
-const background = new Image(); 
-background.src = 'images/D8GEAg5.png'; 
+
 
 const BG = { 
     //first wave img 
@@ -279,13 +291,7 @@ function handleBackground(){
 
 ///////// enemys from from Right & Left  //////////////////////////////////////
 
-//EnemyfromRightImage
-const enemyFromRightImg = new Image(); 
-enemyFromRightImg.src = 'images/enemy1.png';
 
-//EnemyfromLeftImage
-const enemyLeftImg= new Image(); 
-enemyLeftImg.src = 'images/enemyLeft.png';
 
 class EnemyfromRight { 
     constructor () {
@@ -413,6 +419,7 @@ function handleEnemies() {
 }
 
 function handleGameOver() {
+    ctx.rect(0, 0, canvas.width, canvas.height, 'black' )
     ctx.fullStyle = 'white'; 
     ctx.fillText('GAME OVER ' + score, 60, 100 ); 
     gameOver = true; 
@@ -440,3 +447,8 @@ function animate( ) {
 }
 
 animate()
+
+/*
+
+https://stackoverflow.com/questions/17480115/a-function-to-preload-images-need-to-draw-them-now-but-how
+https://www.reddit.com/r/learnprogramming/comments/1xrf6j/html5javascript_canvas_hell_and_image_preloading/ */
